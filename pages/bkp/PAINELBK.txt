@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+
+<head>
+
+
+
+
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="author" content="">
+
+
+
+    <title>Painel de Mensagens - Empresa Fácil</title>
+
+
+    <!-- Bootstrap Core CSS -->
+
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+    <!-- MetisMenu CSS -->
+
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+
+
+    <!-- Timeline CSS -->
+
+    <link href="../dist/css/timeline.css" rel="stylesheet">
+
+
+
+    <!-- Custom CSS -->
+
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+
+
+    <!-- Morris Charts CSS -->
+
+    <link href="../bower_components/morrisjs/morris.css" rel="stylesheet">
+
+
+
+    <!-- Custom Fonts -->
+
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+      <script src="./ckeditor/ckeditor.js"></script>
+
+    
+
+	<script language="JavaScript">
+
+			$(window).load(function(){
+
+			$('#conteudo').fadeIn();
+
+			$('#conteudo').fadeOut(5000);
+
+			});
+
+	</script>
+
+
+</head>
+
+
+
+<body>
+
+	<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+
+		<div class="modal-dialog modal-lg">
+
+			<div class="modal-content" id="txtHint" style="font-size:14px;"> 
+
+	             
+
+   			</div>
+
+		</div>
+
+	</div> 
+
+
+
+<script>
+
+function showCustomer(str) {
+
+  var xhttp;    
+
+  if (str == "") {
+
+    document.getElementById("txtHint").innerHTML = "";
+
+    return;
+
+  }
+
+  xhttp = new XMLHttpRequest();
+
+  xhttp.onreadystatechange = function() {
+
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+
+      document.getElementById("txtHint").innerHTML = xhttp.responseText;
+
+    }
+
+  };
+
+  xhttp.open("GET", "visualizar.php?q=visualizar&id="+str, true);
+
+  xhttp.send();
+
+}
+
+</script>
+
+						
+
+							<?php
+
+		if((!isset ($_SESSION['login']) == true) and (!isset ($_SESSION['senha']) == true)) { 
+
+			
+
+			unset($_SESSION['login']); 
+
+			unset($_SESSION['senha']); 
+
+			header('location:login.php'); 
+
+		} 
+
+
+
+						
+
+								if((isset($_POST['deletar'])) && ($_POST['deletar'] == 'deletar') && (isset($_POST['ativado'])) && ($_POST['ativado'] <> '')){
+
+									$res = new processando();
+
+									$res->Del_mensagem($_POST['ativado']);
+
+								
+
+								}
+
+							
+
+								
+
+								if((isset($_POST['salvar'])) && ($_POST['salvar'] == 'salvar')){
+
+									$res = new processando();
+
+									$res->Cad_mensagem($_POST['titulo'], $_POST['mensagem'], $_POST['data'], $_POST['hora'], $_POST['usuario_msg']);
+
+									
+
+								}
+
+								
+
+								if((isset($_POST['gravar'])) && ($_POST['gravar'] == 'gravar')){
+
+									$res = new processando();
+
+									$rs = $res->At_mensagem($_POST['id_mensagem'], $_POST['titulo'], $_POST['mensagem'], $_POST['data'], $_POST['hora'], $_POST['usuario_msg']);
+
+									
+
+									
+
+								}
+
+								
+
+								if((isset($_POST['retirar'])) && ($_POST['retirar'] == 'retirar')){
+
+									$res = new processando();
+
+									$res->Retirar_mensagem();
+
+																	
+
+								}
+
+								
+
+									
+
+								if((isset($_POST['editar'])) && ($_POST['editar'] == 'editar') && (isset($_POST['ativado'])) && ($_POST['ativado'] <> '')){
+
+									
+
+									$rs = new processando();
+
+									$result = $rs->Ed_mensagem($_POST['ativado']);
+
+								?>
+
+								
+
+									<div class="page-header">
+
+											<center><h1>Painel <small>de noticiais</small></h1></center>
+
+										</div>
+
+
+
+										<div class="container-fluid col-md-6">
+
+										<form class="form-inline" method="post" action="index.php">
+
+										<div class="form-group">
+
+										<div class="input-group md-col-8">
+
+										<label class="sr-only" for="TITULO">Titulo</label>
+
+										<input type="text" class="form-control" name="titulo" size ="130" value="<?=$result->titulo;?>" placeholder="" aria-describedby="basic-addon1">
+
+				
+
+										<span class="input-group-addon" id="basic-addon1">Titulo</span>
+
+										<input type="hidden" class="form-control" name="data" value="<?php echo date('d/m/y'); ?>">
+
+										<input type="hidden" class="form-control" name="hora" value="<?php echo date('H:i'); ?>">
+
+										<input type="hidden" class="form-control" name="usuario_msg" value="<?=$logado;?>">
+
+										<input type="hidden" class="form-control" name="id_mensagem" value="<?=$result->id_mensagem;?>">
+
+										</div>
+
+										</br></br></br>
+
+										
+
+										<textarea id="elm1" name="mensagem"><?=$result->mensagem;?></textarea>
+
+                                         <script>
+
+                								// Replace the <textarea id="editor1"> with a CKEditor
+
+								                // instance, using default configuration.
+
+								                CKEDITOR.replace( 'elm1' );
+
+								            </script>
+
+										</br>
+
+										<button type="submit" class="btn btn-success" name="gravar" value="gravar" onclick="return confirm('Confirma a atualização da mensagem?')">Gravar</button>
+
+                                        <button type="submit" class="btn btn-info" name="novo_limpar" value="">Novo / Limpar</button>
+
+										</form>
+
+										</div>
+
+										</div> 
+
+								<?php	
+
+									
+
+								}else{
+
+								
+
+								?>
+
+		<div class="page-header">
+
+			<center><h1>Painel <small>de noticiais</small></h1></center>
+
+		</div>
+
+	
+
+	<div class="container-fluid col-md-6">
+
+	<form class="form-inline" method="post" action="index.php">
+
+		<div class="form-group">
+
+			<div class="input-group md-col-8">
+
+				<label class="sr-only" for="TITULO">Titulo</label>
+
+				<input type="text" class="form-control" name="titulo" size ="130" value="" placeholder="" aria-describedby="basic-addon1">
+
+				
+
+				<span class="input-group-addon" id="basic-addon1">Titulo</span>
+
+				<input type="hidden" class="form-control" name="data" value="<?php echo date('d/m/y'); ?>">
+
+				<input type="hidden" class="form-control" name="hora" value="<?php echo date('H:i'); ?>">
+
+				<input type="hidden" class="form-control" name="usuario_msg" value="<?=$logado; ?>">
+
+			</div>
+
+			</br> 
+
+</br>			
+
+			</br>
+
+			<textarea id="elm1" name="mensagem"></textarea>
+
+
+
+            <script>
+
+                // Replace the <textarea id="editor1"> with a CKEditor
+
+                // instance, using default configuration.
+
+                CKEDITOR.replace( 'elm1' );
+
+				CKFinder.setupCKEditor( editor );
+
+            </script>
+
+			</br>
+
+			<button type="submit" class="btn btn-success" name="salvar" value="salvar">Salvar</button>
+
+            <button type="submit" class="btn btn-info" name="novo_limpar" value="">Novo / Limpar</button>
+
+			
+
+	</form>
+
+		</div>
+
+	</div>
+
+								<?php } ?>
+
+	<div class="container-fluid col-md-6">
+
+		<div class="panel panel-primary">
+
+			<div class="panel-heading"> Noticiais Salvas</div>
+
+			<div class="panel-body">
+
+		
+
+				<div class="table-overflow">
+
+					<table class="table table-striped">
+
+							<tr>
+
+								<td width="45"><strong>Ativa</strong></td>
+
+								<td width="30"><strong>ID</strong></td>
+
+								<td width="500"><strong>Titulo</strong></td>
+
+								<td width="60"><strong>Data</strong></td>
+
+								<td width="60"><strong>Hora</strong></td>
+
+								<td width="200"><strong>Usuário</strong></td>
+								
+								<td width="30"></td>
+								
+								<td width="30"></td>
+								
+								<td width="30"></td>
+
+							</tr>
+
+						
+
+							<tr>
+
+								<?php
+
+															
+
+								$res = new processando();
+
+								$res->Lst_mensagem();
+
+									
+
+								
+
+								?>
+
+							</tr>
+
+
+
+					
+
+					</table>
+
+				</div>
+
+				</br>
+
+
+			</div>
+
+			
+
+		</div>
+
+	</div>
+
+ 
+
+    <!-- jQuery -->
+
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+
+
+    <!-- Bootstrap Core JavaScript -->
+
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+
+    <!-- Metis Menu Plugin JavaScript -->
+
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+
+
+    <!-- Morris Charts JavaScript -->
+
+    <script src="../bower_components/raphael/raphael-min.js"></script>
+
+    <script src="../bower_components/morrisjs/morris.min.js"></script>
+
+    <script src="../js/morris-data.js"></script>
+
+
+
+    <!-- Custom Theme JavaScript -->
+
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+
+
+</body>
+
+
+
+</html>
+
+
+
